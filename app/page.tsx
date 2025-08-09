@@ -242,10 +242,10 @@ function Contact(){ const { data } = useContent(); return (<Section id="contact"
     <div className="md:col-span-5 md:col-start-8">
       <div className="rounded-3xl border border-neutral-200 bg-white/60 p-6 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/50">
         <div className="mb-2 text-sm text-neutral-500 dark:text-neutral-400">Email</div>
-        <a href={`mailto:${'{'}data.contact.email{'}'}`} className="text-lg text-neutral-900 underline-offset-4 hover:underline dark:text-neutral-100">{'{'}data.contact.email{'}'}</a>
+        <a href={`mailto:${data.contact.email}`} className="text-lg text-neutral-900 underline-offset-4 hover:underline dark:text-neutral-100">{data.contact.email}</a>
         <div className="mt-6 flex items-center gap-3 text-neutral-600 dark:text-neutral-300">
-          <a href={ '{'}data.contact.instagram || "#" {'}'} className="rounded-full border border-neutral-200 bg-white/70 p-2 dark:border-neutral-800 dark:bg-neutral-800"><Instagram className="h-4 w-4" /></a>
-          <a href={ '{'}data.contact.twitter || "#" {'}'} className="rounded-full border border-neutral-200 bg-white/70 p-2 dark:border-neutral-800 dark:bg-neutral-800"><Twitter className="h-4 w-4" /></a>
+          <a href={data.contact.instagram || "#"} className="rounded-full border border-neutral-200 bg-white/70 p-2 dark:border-neutral-800 dark:bg-neutral-800"><Instagram className="h-4 w-4" /></a>
+          <a href={data.contact.twitter || "#"} className="rounded-full border border-neutral-200 bg-white/70 p-2 dark:border-neutral-800 dark:bg-neutral-800"><Twitter className="h-4 w-4" /></a>
         </div>
       </div>
     </div>
