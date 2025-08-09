@@ -347,19 +347,62 @@ function AdminPanel(){ const { data, setData, setAuthed } = useContent(); const 
   </div>);
 }
 
-function AdminGate(){ const { authed, setAuthed, data } = useContent(); const [showLogin,setShowLogin]=useState(false); const [pass,setPass]=useState("");
-  useEffect(()=>{ const hashAdmin=window.location.hash.includes('admin'); if(hashAdmin) setShowLogin(true); const onKey=(e:KeyboardEvent)=>{ if(e.shiftKey && e.key.toLowerCase()==='l') setShowLogin(s=>!s); }; window.addEventListener('keydown', onKey); return ()=> window.removeEventListener('keydown', onKey); },[]);
-  if(!showLogin && !authed) return null;
-  return (<div className="fixed inset-0 z-[55] grid place-items-center bg-black/30 p-4 backdrop-blur-sm">
-    {!authed ? (<div className="w-full max-w-sm rounded-2xl border border-neutral-200 bg-white p-5 shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="mb-2 text-sm text-neutral-500 dark:text-neutral-400">Enter passphrase to edit content</div>
-      <input type="password" value={pass} onChange={(e)=> setPass((e.target as HTMLInputElement).value)} className="mb-3 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800/80" placeholder="Passphrase" />
-      <div className="flex items-center justify-between"><Button variant="ghost" className="rounded-full" onClick={()=>setShowLogin(false)}>Cancel</Button>
-        <Button className="rounded-full" onClick={()=>{ if(pass===(data.admin?.passphrase||'changeme')){ setAuthed(true); setShowLogin(false);} else { alert('Wrong passphrase'); } }}><Save className="mr-1 h-4 w-4"/> Login</Button>
-      </div>
-    </div>) : null}
-  </div>);
+function AdminGate() {
+  const { authed, setAuthed, data } = useContent();
+  const [showLogin, setShowLogin] = useState(false);
+  const [pass, setPass] = useState("");
+
+  useEffect(() => {
+    const hashAdmin = window.location.hash.includes("admin");
+    if (hashAdmin) setShowLogin(true);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.shiftKey && e.key.toLowerCase() === "l") setShowLogin((s) => !s);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  if (!showLogin && !authed) return null;
+
+  return (
+    <div className="fixed inset-0 z-[55] grid place-items-center bg-black/30 p-4 backdrop-blur-sm">
+      {!authed ? (
+        <div className="w-full max-w-sm rounded-2xl border border-neutral-200 bg-white p-5 shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="mb-2 text-sm text-neutral-500 dark:text-neutral-400">Enter passphrase to edit content</div>
+          <input
+            type="password"
+            value={pass}
+            onChange={(e) => setPass(e.target.value)}
+            className="mb-3 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800/80"
+            placeholder="Passphrase"
+          />
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" className="rounded-full" onClick={() => setShowLogin(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="rounded-full"
+              onClick={() => {
+                if (pass === (data.admin?.passphrase || "changeme")) {
+                  setAuthed(true);
+                  setShowLogin(false);
+                } else {
+                  alert("Wrong passphrase");
+                }
+              }}
+            >
+              <Save className="mr-1 h-4 w-4" />
+              Login
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <AdminPanel />
+      )}
+    </div>
+  );
 }
+
 
 export default function Page(){ const [data,setData]=useState<any>(loadFromLocal()); const [authed,setAuthed]=useState<boolean>(false); const [syncing,setSyncing]=useState<boolean>(false);
   useEffect(()=>{ (async()=>{ const cfg=data.admin?.supabase; if(cfg?.enabled && cfg?.url && cfg?.anonKey){ setSyncing(true); const remote=await supaLoad(cfg); setSyncing(false); if(remote){ setData(remote); saveToLocal(remote);} } })(); saveToLocal(data); },[]);
