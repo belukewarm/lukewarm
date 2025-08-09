@@ -30,14 +30,25 @@ const DEFAULT_CONTENT: any = {
 function loadFromLocal(){ try{ const s=localStorage.getItem(LS_KEY); if(!s) return DEFAULT_CONTENT; const parsed=JSON.parse(s); return { ...DEFAULT_CONTENT, ...parsed }; }catch{ return DEFAULT_CONTENT; } }
 function saveToLocal(d:any){ localStorage.setItem(LS_KEY, JSON.stringify(d)); }
 
-async function supaLoad(cfg:any){ if(!cfg?.enabled||!cfg?.url||!cfg?.anonKey) return null; try{
-  const res=await fetch(`${cfg.url}/rest/v1/${cfg.table}?id=eq.${encodeURIComponent(cfg.rowId)}&select=payload`, { headers:{ apikey:cfg.anonKey, Authorization:`Bearer ${cfg.anonKey}` } });
-  if(!res.ok) return null; const rows=await res.json(); if(Array.isArray(rows) && rows[0]?.payload) return rows[0].payload;
-}catch{} return null;}
-async function supaSave(cfg:any, data:any){ if(!cfg?.enabled||!cfg?.url||!cfg?.anonKey) return false; try{
-  const res=await fetch(`${cfg.url}/rest/v1/${cfg.table}`, { method:"POST", headers:{ apikey:cfg.anonKey, Authorization:`Bearer ${cfg.anonKey}`, "Content-Type":"application/json", Prefer:"resolution=merge-duplicates,return=representation" }, body: JSON.stringify([{ id: cfg.rowId, payload: data }]) });
-  return res.ok;
-}catch{ return false; }}
+async function supaLoad(cfg:any){ if(!cfg?.enabled||!cfg?.url||!cfg?.anonKey) return null;
+  try{
+    const res=await fetch(`${cfg.url}/rest/v1/${cfg.table}?id=eq.${encodeURIComponent(cfg.rowId)}&select=payload`,{
+      headers:{ apikey:cfg.anonKey, Authorization:`Bearer ${cfg.anonKey}` }
+    });
+    if(!res.ok) return null; const rows=await res.json();
+    if(Array.isArray(rows) && rows[0]?.payload) return rows[0].payload;
+  }catch{} return null;
+}
+async function supaSave(cfg:any,data:any){ if(!cfg?.enabled||!cfg?.url||!cfg?.anonKey) return false;
+  try{
+    const res=await fetch(`${cfg.url}/rest/v1/${cfg.table}`,{
+      method:"POST",
+      headers:{ apikey:cfg.anonKey, Authorization:`Bearer ${cfg.anonKey}`, "Content-Type":"application/json", Prefer:"resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify([{ id: cfg.rowId, payload: data }])
+    });
+    return res.ok;
+  }catch{ return false; }
+}
 
 const ContentCtx = createContext<any>({ data: DEFAULT_CONTENT, setData:(_:any)=>{}, authed:false, setAuthed:(_:boolean)=>{}, syncing:false, setSyncing:(_:boolean)=>{}, syncNow: async()=>{} });
 function useContent(){ return useContext(ContentCtx); }
@@ -281,7 +292,7 @@ function AdminPanel(){ const { data, setData, setAuthed } = useContent(); const 
     </div>
     <div className="grid h-[70vh] grid-cols-5">
       <div className="border-r border-neutral-200 p-3 text-sm dark:border-neutral-800">
-        {(['work','pricing','quote','hero','contact','security']).map((t)=> (<button key={t} onClick={()=>setTab(t)} className={`mb-1 w-full rounded-xl px-3 py-2 text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 ${tab===t?'bg-neutral-100 dark:bg-neutral-800':''}`}>{t[0].toUpperCase()+t.slice(1)}</button>))}
+        {(['work','pricing','quote','hero','contact','storage','security']).map((t)=> (<button key={t} onClick={()=>setTab(t)} className={`mb-1 w-full rounded-xl px-3 py-2 text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 ${tab===t?'bg-neutral-100 dark:bg-neutral-800':''}`}>{t[0].toUpperCase()+t.slice(1)}</button>))}
       </div>
       <div className="col-span-4 overflow-auto p-4">
         {tab==='work' && (<div><div className="mb-3 flex items-center justify-between"><div className="text-sm text-neutral-600 dark:text-neutral-300">Add links to YouTube/Vimeo/Drive/etc. They’ll open in a new tab.</div><Button size="sm" className="rounded-full" onClick={addProject}><Plus className="h-4 w-4 mr-1"/>Add</Button></div>
@@ -336,6 +347,95 @@ function AdminPanel(){ const { data, setData, setAuthed } = useContent(); const 
             <input value={data.contact.twitter} onChange={(e)=> update({contact:{...data.contact, twitter:(e.target as HTMLInputElement).value}})} className="mt-1 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900/60" />
           </label>
         </div>)}
+        {tab==='storage' && (
+  <div className="grid gap-3 md:max-w-2xl">
+    <div className="mb-2 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
+      <Database className="h-4 w-4" /> Optional cloud sync (free)
+    </div>
+    <p className="text-sm text-neutral-600 dark:text-neutral-300">
+      Use a free Supabase project so edits sync across devices. Create a table named
+      <code className="rounded bg-neutral-200/60 px-1 dark:bg-neutral-800/60"> site_content </code>
+      with columns <code>id</code> (text, primary key) and <code>payload</code> (jsonb).
+    </p>
+
+    <label className="text-sm">Enabled
+      <select
+        value={data.admin.supabase.enabled ? '1' : '0'}
+        onChange={(e)=> {
+          const enabled = e.target.value === '1';
+          const next = { ...data, admin: { ...data.admin, supabase: { ...data.admin.supabase, enabled } } };
+          setData(next); saveToLocal(next);
+        }}
+        className="mt-1 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900/60"
+      >
+        <option value="0">Disabled</option>
+        <option value="1">Enabled</option>
+      </select>
+    </label>
+
+    <label className="text-sm">SUPABASE_URL
+      <input
+        value={data.admin.supabase.url}
+        onChange={(e)=> { const next={...data, admin:{...data.admin, supabase:{...data.admin.supabase, url:e.target.value}}}; setData(next); saveToLocal(next); }}
+        className="mt-1 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900/60"
+        placeholder="https://xxxx.supabase.co"
+      />
+    </label>
+
+    <label className="text-sm">SUPABASE_ANON_KEY (public)
+      <input
+        value={data.admin.supabase.anonKey}
+        onChange={(e)=> { const next={...data, admin:{...data.admin, supabase:{...data.admin.supabase, anonKey:e.target.value}}}; setData(next); saveToLocal(next); }}
+        className="mt-1 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900/60"
+        placeholder="eyJ…"
+      />
+    </label>
+
+    <div className="grid gap-3 md:grid-cols-3">
+      <label className="text-sm">Table
+        <input
+          value={data.admin.supabase.table}
+          onChange={(e)=> { const next={...data, admin:{...data.admin, supabase:{...data.admin.supabase, table:e.target.value}}}; setData(next); saveToLocal(next); }}
+          className="mt-1 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900/60"
+        />
+      </label>
+      <label className="text-sm">Row ID
+        <input
+          value={data.admin.supabase.rowId}
+          onChange={(e)=> { const next={...data, admin:{...data.admin, supabase:{...data.admin.supabase, rowId:e.target.value}}}; setData(next); saveToLocal(next); }}
+          className="mt-1 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900/60"
+        />
+      </label>
+
+      <div className="flex items-end gap-2">
+        <Button
+          size="sm"
+          className="w-full rounded-full"
+          onClick={async ()=> {
+            const remote = await supaLoad(data.admin.supabase);
+            if (remote) { setData(remote); saveToLocal(remote); }
+            else { alert('No remote content found or fetch failed'); }
+          }}
+        >
+          Load from cloud
+        </Button>
+
+        <Button
+          size="sm"
+          variant="secondary"
+          className="w-full rounded-full"
+          onClick={async ()=> {
+            const ok = await supaSave(data.admin.supabase, data);
+            alert(ok ? 'Saved to cloud' : 'Cloud save failed');
+          }}
+        >
+          Save to cloud
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
         {tab==='security' && (<div className="grid gap-3 md:max-w-md">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Set a custom passphrase to open Admin. (Press <kbd>Shift</kbd>+<kbd>L</kbd>.)</p>
           <label className="text-sm">Passphrase
