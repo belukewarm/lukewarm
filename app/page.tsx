@@ -83,7 +83,7 @@ function Hero(){ const {data}=useContent(); const {scrollY}=useScroll(); const y
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <Button asChild={true} className="rounded-full"><a href="#work" className="inline-flex items-center gap-2"><Play className="h-4 w-4"/>See work<ArrowUpRight className="h-4 w-4"/></a></Button>
           <Button asChild={true} variant="ghost" className="rounded-full"><a href="#contact" className="inline-flex items-center gap-2">Book a project<MoveRight className="h-4 w-4"/></a></Button>
-          {vid && (<Button onClick={()=>setOpen(True as any)} variant="secondary" className="rounded-full"><Play className="mr-1 h-4 w-4"/>Watch reel</Button>)}
+          {vid && (<Button onClick={()=>setOpen(true as any)} variant="secondary" className="rounded-full"><Play className="mr-1 h-4 w-4"/>Watch reel</Button>)}
         </div>
         <div className="mt-10 flex items-center gap-4 text-sm text-neutral-500 dark:text-neutral-400">
           <div className="flex items-center gap-2"><Stars className="h-4 w-4"/> Quick turnarounds</div>
