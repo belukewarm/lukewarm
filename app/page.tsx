@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const LS_KEY = "lukesite_v2";
+const ENV_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const ENV_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const DEFAULT_CONTENT: any = {
   hero: { h1Line1: "Minimal edits.", h1Line2: "Maximum impact.", blurb: "I’m Luke — a freelance video editor focused on clean storytelling, punchy pacing, and intentional design. Scandinavian vibe. Zero clutter.", reelUrl: "" },
   contact: { email: "hello@lukeday.studio", instagram: "#", twitter: "#" },
@@ -24,7 +26,17 @@ const DEFAULT_CONTENT: any = {
   ],
   pricing: { hourly: 25, projectFrom: 200, retainerNote: "Reserved hours each month for fast turnarounds." },
   quote: { text: "Luke nailed the cut on the first pass — crisp pacing, clean polish, and thoughtful details that made a real difference.", author: "Agency Producer" },
-  admin: { passphrase: "changeme", supabase: { url: "", anonKey: "", table: "site_content", rowId: "default", enabled: false } },
+  admin: {
+  passphrase: "changeme",
+  supabase: {
+    url: ENV_URL,
+    anonKey: ENV_ANON,
+    table: "site_content",
+    rowId: "default",
+    enabled: !!(ENV_URL && ENV_ANON), // auto-on if both exist
+  },
+},
+
 };
 
 function loadFromLocal(){ try{ const s=localStorage.getItem(LS_KEY); if(!s) return DEFAULT_CONTENT; const parsed=JSON.parse(s); return { ...DEFAULT_CONTENT, ...parsed }; }catch{ return DEFAULT_CONTENT; } }
