@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState, createContext, useContext } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { ArrowUpRight, Mail, Play, Sparkles, Instagram, Twitter, Send, MoveRight, Laptop, Clapperboard, Wand2, Stars, Check, Settings, Plus, Trash2, Save, Upload, Download, Link as LinkIcon, Database } from "lucide-react";
+import { ArrowUpRight, Mail, Play, Sparkles, Instagram, Youtube, Send, MoveRight, Laptop, Clapperboard, Wand2, Stars, Check, Settings, Plus, Trash2, Save, Upload, Download, Link as LinkIcon, Database, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -10,7 +10,7 @@ const ENV_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const ENV_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const DEFAULT_CONTENT: any = {
   hero: { h1Line1: "Minimal edits.", h1Line2: "Maximum impact.", blurb: "I’m Luke — a freelance video editor focused on clean storytelling, punchy pacing, and intentional design. Scandinavian vibe. Zero clutter.", reelUrl: "" },
-  contact: { email: "hello@lukeday.studio", instagram: "#", twitter: "#" },
+  contact: { email: "luke@belukewarm.com", instagram: "#", youtube: "#" },
   services: [
     { icon: "clapper", title: "Edit & Story", desc: "Tight, rhythm-driven cuts that keep people watching.", points: ["Narrative shaping", "Vertical & 16:9", "Social-first pacing"] },
     { icon: "wand", title: "Polish & Finishing", desc: "Color, sound, and motion details that quietly elevate.", points: ["Color balancing", "Mix & cleanup", "Motion touches"] },
@@ -80,20 +80,83 @@ function Section({id,eyebrow,title,children}:{id?:string;eyebrow?:string;title?:
 
 function ServiceIcon({kind}:{kind:string}){ if(kind==="clapper") return <Clapperboard className="h-5 w-5"/>; if(kind==="wand") return <Wand2 className="h-5 w-5"/>; return <Laptop className="h-5 w-5"/>; }
 
-function Nav(){ return (<div className="sticky top-6 z-40 mx-auto max-w-6xl px-4">
-  <div className="flex items-center justify-between rounded-full border border-neutral-200/60 bg-white/70 px-3 py-2 shadow-sm backdrop-blur-md dark:border-neutral-800/60 dark:bg-neutral-900/60">
-    <a href="#home" className="inline-flex items-center gap-2 text-sm font-medium text-neutral-900 dark:text-neutral-100"><div className="h-6 w-6 rounded-full bg-neutral-900 dark:bg-neutral-100" /><span>Luke</span></a>
-    <div className="flex items-center gap-1 text-sm text-neutral-600 dark:text-neutral-300">
-      <a className="rounded-full px-3 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="#work">Work</a>
-      <a className="rounded-full px-3 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="#services">Services</a>
-      <a className="rounded-full px-3 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="#about">About</a>
-      <a className="rounded-full px-3 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="#contact">Contact</a>
+function Nav() {
+  const [open, setOpen] = useState(false);
+
+  // close the menu when navigating (hash links)
+  useEffect(() => {
+    const close = () => setOpen(false);
+    window.addEventListener("hashchange", close);
+    return () => window.removeEventListener("hashchange", close);
+  }, []);
+
+  return (
+    <div className="sticky top-6 z-40 mx-auto max-w-6xl px-4">
+      <div className="relative flex items-center justify-between rounded-full border border-neutral-200/60 bg-white/70 px-3 py-2 shadow-sm backdrop-blur-md dark:border-neutral-800/60 dark:bg-neutral-900/60">
+        {/* Brand */}
+        <a href="#home" className="inline-flex items-center gap-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+          <div className="h-6 w-6 rounded-full bg-neutral-900 dark:bg-neutral-100" />
+          <span>Luke</span>
+        </a>
+
+        {/* Links (desktop) */}
+        <div className="hidden items-center gap-1 text-sm text-neutral-600 dark:text-neutral-300 md:flex">
+          <a className="rounded-full px-3 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="#work">Work</a>
+          <a className="rounded-full px-3 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="#services">Services</a>
+          <a className="rounded-full px-3 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="#about">About</a>
+          <a className="rounded-full px-3 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="#contact">Contact</a>
+        </div>
+
+        {/* CTA (desktop) */}
+        <div className="hidden md:flex items-center gap-2">
+          <Button asChild size="sm" variant="ghost" className="rounded-full">
+            <a href="#contact" className="inline-flex items-center gap-1">
+              <Mail className="h-4 w-4" />
+              <span>Reach out</span>
+            </a>
+          </Button>
+        </div>
+
+        {/* Hamburger (mobile) */}
+        <button
+          className="grid h-9 w-9 place-items-center rounded-full border border-neutral-300/60 bg-white/60 backdrop-blur md:hidden dark:border-neutral-700/60 dark:bg-neutral-900/60"
+          onClick={() => setOpen((s) => !s)}
+          aria-label="Toggle menu"
+        >
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+
+        {/* Mobile dropdown */}
+        {open && (
+          <div className="absolute right-2 top-[calc(100%+8px)] w-[calc(100vw-2rem)] max-w-xs overflow-hidden rounded-2xl border border-neutral-200 bg-white/90 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/90 md:hidden">
+            <div className="grid">
+              {[
+                ["Work", "#work"],
+                ["Services", "#services"],
+                ["About", "#about"],
+                ["Contact", "#contact"],
+              ].map(([label, href]) => (
+                <a
+                  key={label}
+                  href={href}
+                  className="px-4 py-3 text-sm text-neutral-800 hover:bg-neutral-100 dark:text-neutral-100 dark:hover:bg-neutral-800"
+                  onClick={() => setOpen(false)}
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+            <div className="border-t border-neutral-200 p-3 dark:border-neutral-800">
+              <Button asChild className="w-full rounded-full">
+                <a href="#contact" onClick={() => setOpen(false)}><Mail className="mr-2 h-4 w-4" />Reach out</a>
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-    <div className="flex items-center gap-2">
-      <Button asChild={true} size="sm" variant="ghost" className="rounded-full"><a href="#contact" className="inline-flex items-center gap-1"><Mail className="h-4 w-4"/><span>Reach out</span></a></Button>
-    </div>
-  </div>
-</div>);}
+  );
+}
 
 function youtubeIdFromUrl(url:string){ if(!url) return ""; try{ const u=new URL(url); if(u.hostname.includes("youtu.be")) return u.pathname.slice(1); if(u.searchParams.get("v")) return String(u.searchParams.get("v")); const parts=u.pathname.split("/"); const idx=parts.findIndex(p=>p==="embed"); if(idx>=0 && parts[idx+1]) return parts[idx+1]; }catch{} return ""; }
 
@@ -249,16 +312,42 @@ function Pricing(){ const { data } = useContent(); return (<Section eyebrow="Sim
 function Contact(){ const { data } = useContent(); return (<Section id="contact" eyebrow="Start a project" title="Let’s make something clean">
   <div className="grid gap-8 md:grid-cols-12">
     <div className="md:col-span-6">
-      <form className="space-y-4" onSubmit={(e)=>e.preventDefault()}>
+      <form
+  className="space-y-4"
+  onSubmit={(e) => {
+    e.preventDefault();
+    const form = e.currentTarget as HTMLFormElement;
+    const name = (form.querySelector('input[name="name"]') as HTMLInputElement)?.value || "";
+    const email = (form.querySelector('input[name="email"]') as HTMLInputElement)?.value || "";
+    const link  = (form.querySelector('input[name="link"]')  as HTMLInputElement)?.value || "";
+    const msg   = (form.querySelector('textarea[name="message"]') as HTMLTextAreaElement)?.value || "";
+
+    const to = (useContent().data.contact.email || "luke@belukewarm.com").trim();
+    const subject = `New inquiry from ${name || "your site"}`;
+    const bodyLines = [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      link ? `Link: ${link}` : "",
+      "",
+      msg
+    ].filter(Boolean);
+
+    const mailto = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join("\n"))}`;
+    window.location.href = mailto;
+  }}
+>
         <div className="grid gap-3 md:grid-cols-2">
-          <input className="rounded-2xl border border-neutral-300/80 bg-white/70 px-4 py-3 text-sm outline-none ring-0 placeholder:text-neutral-400 focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900/50 dark:text-neutral-100" placeholder="Your name" />
-          <input className="rounded-2xl border border-neutral-300/80 bg-white/70 px-4 py-3 text-sm outline-none ring-0 placeholder:text-neutral-400 focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900/50 dark:text-neutral-100" placeholder="Email" />
-        </div>
-        <input className="w-full rounded-2xl border border-neutral-300/80 bg-white/70 px-4 py-3 text-sm outline-none ring-0 placeholder:text-neutral-400 focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900/50 dark:text-neutral-100" placeholder="Project link or brief (optional)" />
+  <input name="name" className="rounded-2xl ..." placeholder="Your name" />
+  <input name="email" className="rounded-2xl ..." placeholder="Email" />
+</div>
+<input name="link" className="w-full rounded-2xl ..." placeholder="Project link or brief (optional)" />
+<textarea name="message" rows={5} className="w-full rounded-2xl ..." placeholder="What are we making?" />
         <textarea rows={5} className="w-full rounded-2xl border border-neutral-300/80 bg-white/70 px-4 py-3 text-sm outline-none ring-0 placeholder:text-neutral-400 focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900/50 dark:text-neutral-100" placeholder="What are we making?" />
         <div className="flex items-center justify-between">
           <div className="text-sm text-neutral-500 dark:text-neutral-400">Typical reply within 1–2 days.</div>
-          <Button asChild={true} className="rounded-full"><a href={`mailto:${'{'}data.contact.email{'}'}`}><span className="inline-flex items-center">Send <Send className="ml-2 h-4 w-4" /></span></a></Button>
+<Button type="submit" className="rounded-full">
+  <span className="inline-flex items-center">Send <Send className="ml-2 h-4 w-4" /></span>
+</Button>
         </div>
       </form>
     </div>
@@ -267,9 +356,13 @@ function Contact(){ const { data } = useContent(); return (<Section id="contact"
         <div className="mb-2 text-sm text-neutral-500 dark:text-neutral-400">Email</div>
         <a href={`mailto:${data.contact.email}`} className="text-lg text-neutral-900 underline-offset-4 hover:underline dark:text-neutral-100">{data.contact.email}</a>
         <div className="mt-6 flex items-center gap-3 text-neutral-600 dark:text-neutral-300">
-          <a href={data.contact.instagram || "#"} className="rounded-full border border-neutral-200 bg-white/70 p-2 dark:border-neutral-800 dark:bg-neutral-800"><Instagram className="h-4 w-4" /></a>
-          <a href={data.contact.twitter || "#"} className="rounded-full border border-neutral-200 bg-white/70 p-2 dark:border-neutral-800 dark:bg-neutral-800"><Twitter className="h-4 w-4" /></a>
-        </div>
+  <a href={data.contact.instagram || "#"} className="rounded-full border border-neutral-200 bg-white/70 p-2 dark:border-neutral-800 dark:bg-neutral-800" aria-label="Instagram">
+    <Instagram className="h-4 w-4" />
+  </a>
+  <a href={data.contact.youtube || "#"} className="rounded-full border border-neutral-200 bg-white/70 p-2 dark:border-neutral-800 dark:bg-neutral-800" aria-label="YouTube">
+    <Youtube className="h-4 w-4" />
+  </a>
+</div>
       </div>
     </div>
   </div>
@@ -355,9 +448,9 @@ function AdminPanel(){ const { data, setData, setAuthed } = useContent(); const 
           <label className="text-sm">Instagram URL
             <input value={data.contact.instagram} onChange={(e)=> update({contact:{...data.contact, instagram:(e.target as HTMLInputElement).value}})} className="mt-1 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900/60" />
           </label>
-          <label className="text-sm">Twitter/X URL
-            <input value={data.contact.twitter} onChange={(e)=> update({contact:{...data.contact, twitter:(e.target as HTMLInputElement).value}})} className="mt-1 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900/60" />
-          </label>
+          <label className="text-sm">YouTube URL
+  <input value={data.contact.youtube || ""} onChange={(e)=> update({contact:{...data.contact, youtube:(e.target as HTMLInputElement).value}})} className="mt-1 w-full rounded-xl border border-neutral-300 bg-white/70 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900/60" />
+</label>
         </div>)}
         {tab==='storage' && (
   <div className="grid gap-3 md:max-w-2xl">
