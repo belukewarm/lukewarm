@@ -1,28 +1,25 @@
 {
-  "name": "luke-site",
+  "name": "lukewarm-split-portfolio",
+  "version": "0.4.0",
   "private": true,
-  "version": "1.0.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "framer-motion": "latest",
-    "lucide-react": "latest",
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "@radix-ui/react-slot": "latest"
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "lucide-react": "0.452.0",
+    "framer-motion": "11.0.24"
   },
   "devDependencies": {
     "autoprefixer": "10.4.19",
     "postcss": "8.4.38",
-    "tailwindcss": "3.4.14",
-    "typescript": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "@types/node": "latest"
+    "tailwindcss": "3.4.4",
+    "typescript": "5.5.3",
+    "@types/react": "18.3.3",
+    "@types/node": "20.14.9"
   }
 }
-
